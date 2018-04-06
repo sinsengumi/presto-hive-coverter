@@ -21,11 +21,16 @@ public class HiveQueryConverter {
         }
 
         StringBuilder builder = new StringBuilder();
+        String argumentsStr = joinExpressions(arguments);
+
         if (functionName.toString().equals("json_extract_scalar")) {
-            String argumentsStr = joinExpressions(arguments);
             return builder.append(formatQualifiedName(QualifiedName.of("get_json_object"))).append('(').append(argumentsStr).toString();
         } else if (functionName.toString().equals("replace")) {
-            return "aa";
+            if (arguments.size() == 2) {
+                return builder.append(QualifiedName.of("regexp_replace")).append('(').append(argumentsStr + ", ''").toString();
+            } else {
+                return builder.append(QualifiedName.of("regexp_replace")).append('(').append(argumentsStr).toString();
+            }
         } else {
             throw new RuntimeException("Not Support function. " + functionName);
         }
